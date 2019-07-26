@@ -18,7 +18,7 @@ public class KeycloakConnectionImpl implements KeycloakConnection {
 
     private static volatile Keycloak INSTANCE;
 
-    public KeycloakConnectionImpl(KeycloakServerProperties properties){
+    public KeycloakConnectionImpl(KeycloakServerProperties properties) {
         this.properties = properties;
     }
 

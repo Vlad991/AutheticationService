@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @AllArgsConstructor
 @ConfigurationProperties(prefix = "keycloak")
 public class KeycloakServerProperties {
+
     private String appRealm;
     private String idmBrokerAuthUrl;
     private String idmBrokerApp;
