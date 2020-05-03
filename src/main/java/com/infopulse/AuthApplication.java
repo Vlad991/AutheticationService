@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(KeycloakServerProperties.class)
 public class AuthApplication {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);
     }
 
@@ -27,8 +27,8 @@ public class AuthApplication {
 
             Integer port = serverProperties.getPort();
             String rootContextPath = serverProperties.getServlet().getContextPath();
-            if(rootContextPath == null){
-                rootContextPath ="";
+            if (rootContextPath == null) {
+                rootContextPath = "";
             }
             String keycloakContextPath = keycloakServerProperties.getServer().getContextPath();
 

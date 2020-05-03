@@ -5,8 +5,8 @@ import org.springframework.messaging.SubscribableChannel;
 
 public interface UserInput {
 
-    String INPUT = "user-event-input";
+    String INPUT = "user-event-input"; //chanel name
 
     @Input(INPUT)
-    SubscribableChannel input();
+    SubscribableChannel input();     //имплементация подставл. автоматически
 }

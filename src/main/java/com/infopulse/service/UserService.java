@@ -3,11 +3,14 @@ package com.infopulse.service;
 import com.infopulse.configuration.KeycloakConnection;
 import com.infopulse.exception.ValidationException;
 import com.infopulse.messaging.dto.UserDTO;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;
@@ -24,33 +27,36 @@ public class UserService {
 
     private Validator validator;
 
-    public UserService(KeycloakConnection keycloakConnection, Validator validator){
+    public UserService(@Qualifier("broker") KeycloakConnection keycloakConnection, Validator validator) {
         this.keycloakConnection = keycloakConnection;
         this.validator = validator;
     }
 
-    public void insert(UserDTO userDTO){
+    public void insert(UserDTO userDTO) {
         Set<ConstraintViolation<UserDTO>> errors = validator.validate(userDTO);
-        if(!errors.isEmpty()){
+        if (!errors.isEmpty()) {
             throw new ValidationException(errors.iterator().next().getMessage());
         }
 
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
         userRepresentation.setUsername(userDTO.getLogin());
+        Keycloak keycloakClient = keycloakConnection.getKeycloakClient();
+        RealmResource realmResource = keycloakClient.realm("chat");
+        UsersResource usersResource1 = realmResource.users();
+        usersResource1.create(userRepresentation);
 
-        keycloakConnection.getKeycloakClient().realm("chat").users().create(userRepresentation);
         UsersResource usersResource = keycloakConnection.getKeycloakClient().realm("chat").users();
         List<UserRepresentation> userRepresentationList = usersResource.list();
         Optional<UserRepresentation> user = userRepresentationList.stream()
-                .filter(userRep-> userRep.getUsername().equals(userDTO.getLogin()))
+                .filter(userRep -> userRep.getUsername().equals(userDTO.getLogin()))
                 .findFirst();
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
         credentialRepresentation.setTemporary(false);
         credentialRepresentation.setType("password");
         credentialRepresentation.setValue(userDTO.getPassword());
 
-        user.ifPresent(u->{
+        user.ifPresent(u -> {
             keycloakConnection.getKeycloakClient()
                     .realm("chat")
                     .users()
@@ -61,14 +67,14 @@ public class UserService {
                     .clients()
                     .findAll()
                     .stream()
-                    .filter(client-> client.getClientId().equals("MyWebChatProject"))
+                    .filter(client -> client.getClientId().equals("app-broker"))
                     .findFirst().get();
 
             List<RoleRepresentation> roleRepresentations = keycloakConnection.getKeycloakClient().realm("chat")
-                    .users().get(u.getId()).roles().clientLevel(clientRepresentation.getId()).listAll();
+                    .users().get(u.getId()).roles().clientLevel(clientRepresentation.getId()).listAvailable();
 
             RoleRepresentation role = roleRepresentations.stream()
-                    .filter(roleRep->roleRep.getName().equals("ROLE_USER"))
+                    .filter(roleRep -> roleRep.getName().equals("ROLE_USER"))
                     .findFirst().get();
 
             keycloakConnection.getKeycloakClient()

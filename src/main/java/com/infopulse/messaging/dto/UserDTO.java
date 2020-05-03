@@ -16,4 +16,6 @@ public class UserDTO {
     private String login;
     @NotNull(message = "Password is required")
     private String password;
+
+//    private Boolean isBanned;
 }

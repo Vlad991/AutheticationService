@@ -25,13 +25,13 @@ public class KeycloakConnectionImpl implements KeycloakConnection {
     @Override
     public Keycloak getKeycloakClient() {
         if (INSTANCE == null) {
-            synchronized (KeycloakConnectionImpl.class) {
+            synchronized (KeycloakConnectionImpl.class) {   //что б не было создано двух обьектов коннекшон
                 INSTANCE = KeycloakBuilder.builder()
                         .serverUrl(properties.getIdmBrokerAuthUrl())
                         .realm("master")
                         .grantType(OAuth2Constants.PASSWORD)
                         .clientId(properties.getIdmBrokerApp())
-                        .username(properties.getServer().getAdminUser().getUsername())
+                        .username(properties.getServer().getAdminUser().getUsername()) //имя и пароль от которых мы будем конектиться к кейклоак
                         .password(properties.getServer().getAdminUser().getPassword())
                         .build();
             }

@@ -10,10 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties(prefix = "keycloak")
+@ConfigurationProperties(prefix = "keycloak") //считывает настройки из файла
 public class KeycloakServerProperties {
 
-    private String appRealm;
+    private String appRealm;           //настройки в файле (имена должны совпадать)
     private String idmBrokerAuthUrl;
     private String idmBrokerApp;
     private KeycloakServer server;
